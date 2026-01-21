@@ -160,12 +160,8 @@
 				const overlay = document.getElementById('mediaViewer');
 				const container = document.getElementById('viewerContainer');
 
-				container.innerHTML = `
-    <video controls autoplay playsinline loop muted style="max-width:100%; height:auto;">
-        <source src="${src}" type="video/mp4">
-        Il tuo browser non supporta il video.
-    </video>`;
-
+				container.innerHTML = `<video controls autoplay playsinline loop muted style="max-width:100%; height:auto;">
+        								<source src="${src}" type="video/mp4"> Il tuo browser non supporta il video. </video>`;
 				if (type === 'image') {
 					container.innerHTML = `<img src="${src}" alt="Preview">`;
 				} else if (type === 'video') {
