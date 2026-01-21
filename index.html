@@ -128,9 +128,9 @@
 						</div>
 						<ul class="actions">
 							<li><input id="submit-btn" type="submit" value="Send Message" /></li>
+							<li><span id="form-status" style="font-weight: bold; font-size: 0.9em;"></span></li>
 						</ul>
 					</form>
-					<p id="form-status"></p>
 					<ul class="contact">
 						<li class="icon solid fa-home">
 							Italy
@@ -159,15 +159,16 @@
 
 	<script>
     /* --- GESTIONE VIEWER MEDIA --- */
-    function openViewer(type, src) {
+  function openViewer(type, src) {
         const overlay = document.getElementById('mediaViewer');
         const container = document.getElementById('viewerContainer');
-        container.innerHTML = ''; // Svuota il contenitore
+        if (!overlay || !container) return;
+        
+        container.innerHTML = ''; 
 
         if (type === 'image') {
             container.innerHTML = `<img src="${src}" alt="Preview" style="max-width:100%; height:auto;">`;
         } else if (type === 'video') {
-            // Aggiunti attributi per massima compatibilità browser (muted + playsinline)
             container.innerHTML = `
                 <video controls autoplay playsinline muted loop style="max-width:100%; height:auto;">
                     <source src="${src}" type="video/mp4">
@@ -182,50 +183,56 @@
     function closeViewer() {
         const overlay = document.getElementById('mediaViewer');
         const container = document.getElementById('viewerContainer');
-        overlay.style.display = 'none';
-        container.innerHTML = ''; // Ferma il video quando chiudi
+        if (overlay) overlay.style.display = 'none';
+        if (container) container.innerHTML = ''; 
         document.body.style.overflow = 'auto';
     }
 
     /* --- GESTIONE FORM INVIO MAIL --- */
     const form = document.getElementById("contact-form");
-    const status = document.getElementById("form-status");
-    const button = document.getElementById("submit-btn");
 
     if (form) {
-        form.addEventListener("submit", async function(event) {
+        form.addEventListener("submit", function(event) {
             event.preventDefault();
             
-            // Blocco immediato per evitare click multipli
-            button.disabled = true;
-            button.value = "Sending...";
-            status.innerHTML = "";
-
+            const button = document.getElementById("submit-btn");
+            const status = document.getElementById("form-status");
             const data = new FormData(event.target);
 
+            // Blocco bottone
+            if (button) {
+                button.disabled = true;
+                button.value = "Sending...";
+            }
+
             fetch(event.target.action, {
-                method: form.method,
+                method: 'POST',
                 body: data,
                 headers: { 'Accept': 'application/json' }
             }).then(response => {
                 if (response.ok) {
-                    status.innerHTML = "Thanks! Your message has been sent.";
-                    status.style.color = "#27ae60"; // Verde
+                    if (status) {
+                        status.innerHTML = " ✓ Sent!";
+                        status.style.color = "#27ae60";
+                    }
                     form.reset();
-                    button.value = "Sent!";
+                    if (button) button.value = "Sent!";
                 } else {
-                    response.json().then(data => {
-                        status.innerHTML = "Oops! Problem sending form.";
-                        status.style.color = "#ff4d4d"; // Rosso
+                    if (status) {
+                        status.innerHTML = " ✘ Error";
+                        status.style.color = "#ff4d4d";
+                    }
+                    if (button) {
                         button.disabled = false;
                         button.value = "Try Again";
-                    })
+                    }
                 }
             }).catch(error => {
-                status.innerHTML = "Connection error.";
-                status.style.color = "#ff4d4d";
-                button.disabled = false;
-                button.value = "Try Again";
+                if (status) status.innerHTML = " ✘ Connection Error";
+                if (button) {
+                    button.disabled = false;
+                    button.value = "Try Again";
+                }
             });
         });
     }
@@ -233,6 +240,7 @@
 
 			</body >
 </html >
+
 
 
 
