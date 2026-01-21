@@ -72,9 +72,9 @@
 							<h4>VR Horror</h4>
 							<div class="box alt">
 								<div class="row gtr-uniform">
-									<div class="col-4"><span class="image fit" style="cursor:pointer" onclick="openViewer('video', 'images/candle.mp4')"><img src="images/candle_painting.png" alt="" /></span></div>
-									<div class="col-4"><span class="image fit" style="cursor:pointer" onclick="openViewer('video', 'images/stove.mp4')"><img src="images/st_close.png" alt="" /></span></div>
-									<div class="col-4"><span class="image fit" style="cursor:pointer" onclick="openViewer('video', 'images/wellwater.mp4')"><img src="images/well2.png" alt="" /></span></div>
+									<div class="col-4"><span class="image fit" style="cursor:pointer" onclick="openViewer('video', 'video/candle.mp4')"><img src="images/candle_painting.png" alt="" /></span></div>
+									<div class="col-4"><span class="image fit" style="cursor:pointer" onclick="openViewer('video', 'video/stove.mp4')"><img src="images/st_close.png" alt="" /></span></div>
+									<div class="col-4"><span class="image fit" style="cursor:pointer" onclick="openViewer('video', 'video/wellwater.mp4')"><img src="images/well2.png" alt="" /></span></div>
 								</div>
 							</div>
 							<h4>VR Paddle Master</h4>
@@ -184,8 +184,23 @@
 				container.innerHTML = '';
 				document.body.style.overflow = 'auto';
 			}
+
+			document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const btn = form.querySelector('input[type="submit"]');
+            
+            if (btn.disabled) return;
+
+            btn.disabled = true;
+            btn.value = "Inviando...";
+        });
+    }
+});
 		</script>
 
 			</body >
 </html >
+
 
