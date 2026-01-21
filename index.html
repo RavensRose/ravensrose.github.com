@@ -110,23 +110,24 @@
 				<div class="inner">
 					<h2 class="major">Get in touch</h2>
 					<p>Feel free to contact me for collaborations, feedbacks or feature requests.</p>
-					<form method="post" action="#">
+					<form id="contact-form" action="https://formspree.io/f/mpqqkpnb" method="POST">
 						<div class="fields">
 							<div class="field">
 								<label for="name">Name</label>
-								<input type="text" name="name" id="name" />
+								<input type="text" name="name" id="name" required/>
 							</div>
 							<div class="field">
 								<label for="email">Your Email</label>
-								<input type="email" name="email" id="email" />
+								<input type="email" name="email" id="email" required/>
 							</div>
 							<div class="field">
 								<label for="message">Message</label>
-								<textarea name="message" id="message" rows="4"></textarea>
+								<textarea name="message" id="message" rows="4" required></textarea>
 							</div>
+							<input type="text" name="_gotcha" style="display:none" />
 						</div>
 						<ul class="actions">
-							<li><input type="button" value="I'm working on it :(" onclick="alert('Coming soon!')" /></li>
+							<li><input id="submit-btn" type="submit" value="Send Message" /></li>
 						</ul>
 					</form>
 					<ul class="contact">
@@ -155,52 +156,82 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
 
-		<script>
-			function openViewer(type, src) {
-				const overlay = document.getElementById('mediaViewer');
-				const container = document.getElementById('viewerContainer');
+	<script>
+    /* --- GESTIONE VIEWER MEDIA --- */
+    function openViewer(type, src) {
+        const overlay = document.getElementById('mediaViewer');
+        const container = document.getElementById('viewerContainer');
+        container.innerHTML = ''; // Svuota il contenitore
 
-				container.innerHTML = `<video controls autoplay playsinline loop muted style="max-width:100%; height:auto;">
-        								<source src="${src}" type="video/mp4"> Il tuo browser non supporta il video. </video>`;
-				if (type === 'image') {
-					container.innerHTML = `<img src="${src}" alt="Preview">`;
-				} else if (type === 'video') {
-					container.innerHTML = `
-						<video controls autoplay>
-							<source src="${src}" type="video/mp4">
-							Il tuo browser non supporta il video.
-						</video>`;
-				}
+        if (type === 'image') {
+            container.innerHTML = `<img src="${src}" alt="Preview" style="max-width:100%; height:auto;">`;
+        } else if (type === 'video') {
+            // Aggiunti attributi per massima compatibilità browser (muted + playsinline)
+            container.innerHTML = `
+                <video controls autoplay playsinline muted loop style="max-width:100%; height:auto;">
+                    <source src="${src}" type="video/mp4">
+                    Il tuo browser non supporta il video.
+                </video>`;
+        }
 
-				overlay.style.display = 'flex';
-				document.body.style.overflow = 'hidden';
-			}
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
 
-			function closeViewer() {
-				const overlay = document.getElementById('mediaViewer');
-				const container = document.getElementById('viewerContainer');
+    function closeViewer() {
+        const overlay = document.getElementById('mediaViewer');
+        const container = document.getElementById('viewerContainer');
+        overlay.style.display = 'none';
+        container.innerHTML = ''; // Ferma il video quando chiudi
+        document.body.style.overflow = 'auto';
+    }
 
-				overlay.style.display = 'none';
-				container.innerHTML = '';
-				document.body.style.overflow = 'auto';
-			}
+    /* --- GESTIONE FORM INVIO MAIL --- */
+    const form = document.getElementById("contact-form");
+    const status = document.getElementById("form-status");
+    const button = document.getElementById("submit-btn");
 
-			document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
     if (form) {
-        form.addEventListener('submit', function(e) {
-            const btn = form.querySelector('input[type="submit"]');
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
             
-            if (btn.disabled) return;
+            // Blocco immediato per evitare click multipli
+            button.disabled = true;
+            button.value = "Sending...";
+            status.innerHTML = "";
 
-            btn.disabled = true;
-            btn.value = "Inviando...";
+            const data = new FormData(event.target);
+
+            fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    status.innerHTML = "Thanks! Your message has been sent.";
+                    status.style.color = "#27ae60"; // Verde
+                    form.reset();
+                    button.value = "Sent!";
+                } else {
+                    response.json().then(data => {
+                        status.innerHTML = "Oops! Problem sending form.";
+                        status.style.color = "#ff4d4d"; // Rosso
+                        button.disabled = false;
+                        button.value = "Try Again";
+                    })
+                }
+            }).catch(error => {
+                status.innerHTML = "Connection error.";
+                status.style.color = "#ff4d4d";
+                button.disabled = false;
+                button.value = "Try Again";
+            });
         });
     }
-});
-		</script>
+</script>
 
 			</body >
 </html >
+
 
 
